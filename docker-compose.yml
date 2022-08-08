@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  ecommerce-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    volumes:
+      - ./src:/usr/app/src
+    container_name: ecommerce-api
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+    command: yarn dev
