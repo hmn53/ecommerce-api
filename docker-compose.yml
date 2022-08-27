@@ -1,16 +1,34 @@
 version: "3.7"
 
 services:
+  postgres:
+    image: postgres:14.4-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=ecommerce
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
   ecommerce-api:
     build:
       context: .
       dockerfile: Dockerfile
       target: base
+    depends_on:
+      - postgres
     volumes:
       - ./src:/usr/app/src
+      - /usr/src/app/node_modules
     container_name: ecommerce-api
     expose:
       - "8080"
     ports:
       - "8080:8080"
     command: yarn dev
+
+volumes:
+  postgres:
