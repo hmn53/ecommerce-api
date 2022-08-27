@@ -6,3 +6,76 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Seller {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(50)
+  companyName String? @db.VarChar(50)
+  username    String  @unique @db.VarChar(30)
+  password    String  @db.VarChar(100)
+
+  catalog Catalog?
+
+  @@map("seller")
+}
+
+model Buyer {
+  id       Int    @id @default(autoincrement())
+  name     String @db.VarChar(50)
+  username String @unique @db.VarChar(30)
+  password String @db.VarChar(100)
+
+  Order Order[]
+
+  @@map("buyer")
+}
+
+model Catalog {
+  id       Int @id @default(autoincrement())
+  sellerId Int @unique
+
+  seller Seller @relation(fields: [sellerId], references: [id])
+
+  Product Product[]
+  Order   Order[]
+
+  @@map("catalog")
+}
+
+model Product {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(50)
+  price      Int
+  catalog_id Int
+  createdAt  DateTime @default(now())
+
+  catalog Catalog @relation(fields: [catalog_id], references: [id])
+
+  OrderItems OrderItems[]
+
+  @@map("product")
+}
+
+model Order {
+  id         Int @id @default(autoincrement())
+  catalog_id Int
+  buyer_id   Int
+
+  catalog Catalog @relation(fields: [catalog_id], references: [id])
+  buyer   Buyer   @relation(fields: [buyer_id], references: [id])
+
+  OrderItems OrderItems[]
+
+  @@map("order")
+}
+
+model OrderItems {
+  id         Int @id @default(autoincrement())
+  product_id Int
+  order_id   Int
+
+  product Product @relation(fields: [product_id], references: [id])
+  order   Order   @relation(fields: [order_id], references: [id])
+
+  @@map("orderItems")
+}
